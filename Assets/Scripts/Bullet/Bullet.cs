@@ -6,13 +6,17 @@ using UnityEngine.InputSystem;
 
 public class Bullet : MonoBehaviour
 {
+    /// <summary>基本 /// </summary>
     [SerializeField] float _scaleObject;
-    [SerializeField] float _speed;
+    [SerializeField] float _bulletSpeed;
+    private float shootInterval;
+    public float shootCount;
+    /// <summary>弾をばらける際に必要 /// </summary>
     [SerializeField] Transform _randomBulletTransformRangeScale_PointA;
     [SerializeField] Transform _randomBulletTransformRangeScale_PointB;
 
-    /// <summary>弾を形成する際に必要なもの/// </summary>
-    public GameObject _mainBullet;
+    /// <summary>弾を形成する際に必要/// </summary>
+    public GameObject _mainBullet;//Bulletを分ける際に元になる弾
     public Material subBulletMaterial;
     public Vector3 sectionCount;
     private Vector3 sizeOfOriginalBullet;
@@ -21,11 +25,12 @@ public class Bullet : MonoBehaviour
     private Transform parentTransform;
     private GameObject _subBullet;
 
+    /// <summary>敵を狙う際に必要/// </summary>
     public Vector3 _mousePostion;
 
     void Start()
     {
-        
+        _scaleObject = 0;
     }
 
     void Update()
@@ -33,7 +38,7 @@ public class Bullet : MonoBehaviour
         
     }
 
-    void Devidet()
+    void Devide()
     {
         if (_mainBullet == null)
             _mainBullet = gameObject;
@@ -114,7 +119,28 @@ public class Bullet : MonoBehaviour
         }
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
+            GameObject scaleBullet = GameObject.Instantiate(_mainBullet)as GameObject;
+            scaleBullet.transform.localScale = new  Vector3(_scaleObject, _scaleObject, _scaleObject);
+            _scaleObject = 0;
+        }
 
+    }
+
+    void Shoot()
+    {
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            shootInterval += 1;
+
+            if (shootInterval %5 == 0 && shootCount > 0)
+            {
+                shootCount += 1;
+                GameObject bullet = (GameObject)Instantiate(_mainBullet, transform.position,
+               Quaternion.Euler(transform.parent.eulerAngles.x, transform.parent.eulerAngles.y, 0));
+                Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+            }
+
+            Destroy(_mainBullet, 3.0f);
         }
     }
 }
